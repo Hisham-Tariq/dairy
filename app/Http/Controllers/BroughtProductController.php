@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\BroughtProduct;
-use App\Models\Product;
+use App\Models\RawProduct;
 
 class BroughtProductController extends Controller
 {
@@ -25,7 +25,7 @@ class BroughtProductController extends Controller
 
     public function create()
     {
-        $products = Product::all();
+        $products = RawProduct::all();
         return view('brought-products.create', compact('products'));
     }
 
@@ -43,7 +43,7 @@ class BroughtProductController extends Controller
 
     public function edit(BroughtProduct $broughtProduct)
     {
-        $products = Product::all();
+        $products = RawProduct::all();
         return view('brought-products.edit', compact('broughtProduct', 'products'));
     }
 

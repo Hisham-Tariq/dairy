@@ -106,7 +106,12 @@
                             </svg>
                             Products
                         </a>
-
+                        <a href="{{ route('rawproducts.index') }}" onclick="handleNavClick(event)" class="group flex items-center px-3 py-2.5 text-sm font-medium rounded-lg {{ request()->routeIs('rawproducts.*') ? 'bg-blue-50 text-blue-600' : 'text-secondary-700 hover:bg-secondary-50' }} transition-colors duration-200">
+                            <svg class="mr-3 h-5 w-5 {{ request()->routeIs('rawproducts.*') ? 'text-blue-600' : 'text-secondary-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                            </svg>
+                           Raw Products
+                        </a>
                         <a href="{{ route('dairy-productions.index') }}" onclick="handleNavClick(event)" class="group flex items-center px-3 py-2.5 text-sm font-medium rounded-lg {{ request()->routeIs('dairy-productions.*') ? 'bg-blue-50 text-blue-600' : 'text-secondary-700 hover:bg-secondary-50' }} transition-colors duration-200">
                             <svg class="mr-3 h-5 w-5 {{ request()->routeIs('dairy-productions.*') ? 'text-blue-600' : 'text-secondary-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
@@ -126,6 +131,12 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
                             </svg>
                             Brought Products
+                        </a>
+                        <a href="{{ route('Freezertemp.index') }}" onclick="handleNavClick(event)" class="group flex items-center px-3 py-2.5 text-sm font-medium rounded-lg {{ request()->routeIs('Freezertemp.*') ? 'bg-blue-50 text-blue-600' : 'text-secondary-700 hover:bg-secondary-50' }} transition-colors duration-200">
+                            <svg class="mr-3 h-5 w-5 {{ request()->routeIs('Freezertemp.*') ? 'text-blue-600' : 'text-secondary-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                            </svg>
+                            Freezer Temperature
                         </a>
                     </nav>
 

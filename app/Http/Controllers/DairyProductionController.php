@@ -7,6 +7,7 @@ use App\Models\DairyProduction;
 use App\Models\Product;
 use App\Models\Worker;
 use App\Models\ProductionHelper;
+use App\Models\DairyProductionMixer;
 use Illuminate\Support\Facades\DB;
 
 class DairyProductionController extends Controller
@@ -14,7 +15,7 @@ class DairyProductionController extends Controller
     public function index(Request $request)
     {
         $search = $request->get('search');
-        $productions = DairyProduction::with(['product', 'mixer', 'supervisor', 'helpers.worker'])
+        $productions = DairyProduction::with(['product', 'mixers.worker', 'supervisor', 'helpers.worker'])
             ->when($search, function ($query, $search) {
                 return $query->whereHas('product', function ($q) use ($search) {
                     $q->where('name', 'like', '%' . $search . '%');
@@ -22,7 +23,7 @@ class DairyProductionController extends Controller
             })
             ->latest()
             ->paginate(10);
-
+        //    return $productions;
         return view('dairy-productions.index', compact('productions'));
     }
 
@@ -31,101 +32,144 @@ class DairyProductionController extends Controller
         $products = Product::all();
         $mixers = Worker::where('skills', 'like', '%Mixer%')->get();
         $supervisors = Worker::where('is_supervisor', true)->get();
-        $helpers = Worker::where('skills', 'like', '%Prep & Deposit%')->get();
+    //    $helpers = Worker::where('skills', 'like', '%Prep & Deposit%')->get();
+        $helpers = Worker::all();
+    //    $packingWorkers = Worker::where('skills', 'like', '%Packing Machine%')->get();
+      //  $packingWorkers = Worker::all();
 
         return view('dairy-productions.create', compact('products', 'mixers', 'supervisors', 'helpers'));
     }
 
     public function store(Request $request)
     {
-        $request->validate([
-            'product_id' => 'required|exists:products,id',
-            'mixer_id' => 'required|exists:workers,id',
-            'supervisor_id' => 'required|exists:workers,id',
-            'number_of_trays' => 'required|integer|min:1',
-            'baking_temp' => 'required|numeric',
-            'baking_time' => 'required|integer',
-            'helpers' => 'nullable|array',
-            'helpers.*.worker_id' => 'required|exists:workers,id',
-            'helpers.*.table_number' => 'nullable|integer',
-        ]);
+        // $request->validate([
+        //     'product_id' => 'required|exists:products,id',
+        //     'mixer_ids' => 'required|array|min:1',
+        //     'mixer_ids.*' => 'exists:workers,id',
+        //     'supervisor_id' => 'required|exists:workers,id',
+        //     'number_of_trays' => 'required|integer|min:1',
+        //     'total_bowls' => 'nullable|integer|min:1',
+        //     'total_tables' => 'nullable|integer|min:1',
+        //     'baking_temp' => 'required|numeric',
+        //     'baking_time' => 'required|integer',
+        //     'helper_ids' => 'nullable|array',
+        //     'helper_ids.*' => 'exists:workers,id',
+        //     'helper_table_numbers' => 'nullable|array',
+        //     'packing_worker_ids' => 'nullable|array',
+        //     'packing_worker_ids.*' => 'exists:workers,id',
+        // ]);
 
-        DB::beginTransaction();
-        try {
-            $batchNumber = $this->generateBatchNumber($request->number_of_trays);
+     //   DB::beginTransaction();
+       // try {
+           // $batchNumber = $this->generateBatchNumber($request->number_of_trays);
 
             $production = DairyProduction::create([
                 'product_id' => $request->product_id,
-                'mixer_id' => $request->mixer_id,
                 'supervisor_id' => $request->supervisor_id,
                 'number_of_trays' => $request->number_of_trays,
-                'batch_number' => $batchNumber,
+                'total_bowls' => $request->total_bowls,
+                'total_tables' => $request->total_tables,
+                'batch_number' => 1,
                 'baking_temp' => $request->baking_temp,
                 'baking_time' => $request->baking_time,
             ]);
-
-            if ($request->has('helpers')) {
-                foreach ($request->helpers as $helper) {
-                    ProductionHelper::create([
+//return $production;
+            // Attach mixers
+           // $production->mixers()->attach($request->mixer_ids);
+            if ($request->has('mixer_ids')) {
+                foreach ($request->mixer_ids as $index => $workerId) {
+                    DairyProductionMixer::create([
                         'dairy_production_id' => $production->id,
-                        'worker_id' => $helper['worker_id'],
-                        'table_number' => $helper['table_number'] ?? null,
+                        'worker_id' => $workerId,
                     ]);
                 }
             }
 
-            DB::commit();
+            // Attach packing workers
+            // if ($request->has('packing_worker_ids')) {
+            //     $production->packingWorkers()->attach($request->packing_worker_ids);
+            // }
+
+            // Attach helpers with table numbers
+            if ($request->has('helper_ids')) {
+                foreach ($request->helper_ids as $index => $workerId) {
+                    ProductionHelper::create([
+                        'dairy_production_id' => $production->id,
+                        'worker_id' => $workerId,
+                        'table_number' => $request->helper_table_numbers[$index] ?? null,
+                    ]);
+                }
+            }
+
+         //   DB::commit();
             return redirect()->route('dairy-productions.index')->with('success', 'Dairy production created successfully.');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return back()->withInput()->with('error', 'Failed to create production: ' . $e->getMessage());
-        }
+        // } catch (\Exception $e) {
+        //     DB::rollBack();
+        //     return back()->withInput()->with('error', 'Failed to create production: ' . $e->getMessage());
+        // }
     }
 
     public function edit(DairyProduction $dairyProduction)
     {
-        $dairyProduction->load('helpers.worker');
+        $dairyProduction->load(['mixers', 'helpers.worker', 'packingWorkers']);
         $products = Product::all();
         $mixers = Worker::where('skills', 'like', '%Mixer%')->get();
         $supervisors = Worker::where('is_supervisor', true)->get();
         $helpers = Worker::where('skills', 'like', '%Prep & Deposit%')->get();
+        $packingWorkers = Worker::where('skills', 'like', '%Packing Machine%')->get();
 
-        return view('dairy-productions.edit', compact('dairyProduction', 'products', 'mixers', 'supervisors', 'helpers'));
+        return view('dairy-productions.edit', compact('dairyProduction', 'products', 'mixers', 'supervisors', 'helpers', 'packingWorkers'));
     }
 
     public function update(Request $request, DairyProduction $dairyProduction)
     {
         $request->validate([
             'product_id' => 'required|exists:products,id',
-            'mixer_id' => 'required|exists:workers,id',
+            'mixer_ids' => 'required|array|min:1',
+            'mixer_ids.*' => 'exists:workers,id',
             'supervisor_id' => 'required|exists:workers,id',
             'number_of_trays' => 'required|integer|min:1',
+            'total_bowls' => 'nullable|integer|min:1',
+            'total_tables' => 'nullable|integer|min:1',
             'baking_temp' => 'required|numeric',
             'baking_time' => 'required|integer',
-            'helpers' => 'nullable|array',
-            'helpers.*.worker_id' => 'required|exists:workers,id',
-            'helpers.*.table_number' => 'nullable|integer',
+            'helper_ids' => 'nullable|array',
+            'helper_ids.*' => 'exists:workers,id',
+            'helper_table_numbers' => 'nullable|array',
+            'packing_worker_ids' => 'nullable|array',
+            'packing_worker_ids.*' => 'exists:workers,id',
         ]);
 
         DB::beginTransaction();
         try {
             $dairyProduction->update([
                 'product_id' => $request->product_id,
-                'mixer_id' => $request->mixer_id,
                 'supervisor_id' => $request->supervisor_id,
                 'number_of_trays' => $request->number_of_trays,
+                'total_bowls' => $request->total_bowls,
+                'total_tables' => $request->total_tables,
                 'baking_temp' => $request->baking_temp,
                 'baking_time' => $request->baking_time,
             ]);
 
-            $dairyProduction->helpers()->delete();
+            // Sync mixers
+            $dairyProduction->mixers()->sync($request->mixer_ids);
 
-            if ($request->has('helpers')) {
-                foreach ($request->helpers as $helper) {
+            // Sync packing workers
+            if ($request->has('packing_worker_ids')) {
+                $dairyProduction->packingWorkers()->sync($request->packing_worker_ids);
+            } else {
+                $dairyProduction->packingWorkers()->sync([]);
+            }
+
+            // Delete and recreate helpers
+            $dairyProduction->helpers()->delete();
+            if ($request->has('helper_ids')) {
+                foreach ($request->helper_ids as $index => $workerId) {
                     ProductionHelper::create([
                         'dairy_production_id' => $dairyProduction->id,
-                        'worker_id' => $helper['worker_id'],
-                        'table_number' => $helper['table_number'] ?? null,
+                        'worker_id' => $workerId,
+                        'table_number' => $request->helper_table_numbers[$index] ?? null,
                     ]);
                 }
             }

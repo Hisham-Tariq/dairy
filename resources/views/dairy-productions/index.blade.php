@@ -81,15 +81,27 @@
                             <td class="px-6 py-4">
                                 <div class="text-sm font-medium text-secondary-900">{{ $production->product->name }}</div>
                             </td>
+                       
                             <td class="px-6 py-4">
-                                <div class="text-sm text-secondary-900">{{ $production->mixer->name }}</div>
+                                @if($production->mixers->count() > 0)
+                                    <div class="space-y-1">
+                                        @foreach($production->mixers as $mixer)
+                                            <div class="text-sm text-secondary-900">
+                                                {{ $mixer->worker->name }},
+                                            
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @else
+                                    <span class="text-sm text-secondary-400">-</span>
+                                @endif
                             </td>
                             <td class="px-6 py-4">
-                                @if($production->helpers->count() > 0)
+                            @if($production->helpers->count() > 0)
                                     <div class="space-y-1">
                                         @foreach($production->helpers as $helper)
                                             <div class="text-sm text-secondary-900">
-                                                {{ $helper->worker->name }}
+                                                {{ $helper->worker->name }},
                                                 @if($helper->table_number)
                                                     <span class="text-xs text-secondary-500">(Table {{ $helper->table_number }})</span>
                                                 @endif

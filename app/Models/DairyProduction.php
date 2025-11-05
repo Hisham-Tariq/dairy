@@ -24,9 +24,9 @@ class DairyProduction extends Model
         return $this->belongsTo(Product::class);
     }
 
-    public function mixer()
+    public function mixers()
     {
-        return $this->belongsTo(Worker::class, 'mixer_id');
+        return $this->hasMany(DairyProductionMixer::class);
     }
 
     public function supervisor()

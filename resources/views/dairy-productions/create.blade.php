@@ -62,18 +62,26 @@
                         </div>
                     </div>
 
-                    <!-- Mixer Selection -->
+                    <!-- Mixer Selection (Multiple) -->
                     <div>
-                        <label for="mixer_id" class="form-label">Mixer</label>
-                        <select id="mixer_id" name="mixer_id" required class="form-input @error('mixer_id') border-red-500 @enderror">
-                            <option value="">Select a mixer</option>
-                            @foreach($mixers as $mixer)
-                                <option value="{{ $mixer->id }}" {{ old('mixer_id') == $mixer->id ? 'selected' : '' }}>
-                                    {{ $mixer->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                        @error('mixer_id')
+                        <label class="form-label">Mixers (Select Multiple)</label>
+                        <div class="relative">
+                            <button type="button" id="mixerDropdownBtn" class="form-input w-full text-left flex justify-between items-center @error('mixer_ids') border-red-500 @enderror">
+                                <span id="mixerSelectedText" class="text-gray-400">Select mixers...</span>
+                                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </button>
+                            <div id="mixerDropdown" class="hidden absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                                @foreach($mixers as $mixer)
+                                    <label class="flex items-center px-4 py-2 hover:bg-gray-50 cursor-pointer">
+                                        <input type="checkbox" name="mixer_ids[]" value="{{ $mixer->id }}" class="mixer-checkbox mr-3 h-4 w-4 text-blue-600 rounded" {{ in_array($mixer->id, old('mixer_ids', [])) ? 'checked' : '' }}>
+                                        <span>{{ $mixer->name }}</span>
+                                    </label>
+                                @endforeach
+                            </div>
+                        </div>
+                        @error('mixer_ids')
                             <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
@@ -94,29 +102,79 @@
                         @enderror
                     </div>
 
-                    <!-- Number of Trays -->
-                    <div>
-                        <label for="number_of_trays" class="form-label">Number of Trays</label>
-                        <input type="number" id="number_of_trays" name="number_of_trays" value="{{ old('number_of_trays') }}" required min="1" class="form-input @error('number_of_trays') border-red-500 @enderror" placeholder="Enter number of trays">
-                        <p class="mt-1 text-sm text-secondary-500">Batch number will be auto-generated: YYYYMMDD + Tray count</p>
-                        @error('number_of_trays')
+                    <!-- Number of Trays, Total Bowls, Total Tables -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div>
+                            <label for="number_of_trays" class="form-label">Number of Trays</label>
+                            <input type="number" id="number_of_trays" name="number_of_trays" value="{{ old('number_of_trays') }}" required min="1" class="form-input @error('number_of_trays') border-red-500 @enderror" placeholder="Enter trays">
+                            @error('number_of_trays')
+                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        <div>
+                            <label for="total_bowls" class="form-label">Total Bowls</label>
+                            <input type="number" id="total_bowls" name="total_bowls" value="{{ old('total_bowls') }}" min="1" class="form-input @error('total_bowls') border-red-500 @enderror" placeholder="Enter bowls">
+                            @error('total_bowls')
+                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        <div>
+                            <label for="total_tables" class="form-label">Total Tables</label>
+                            <input type="number" id="total_tables" name="total_tables" value="{{ old('total_tables') }}" min="1" class="form-input @error('total_tables') border-red-500 @enderror" placeholder="Enter tables">
+                            @error('total_tables')
+                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+                    <p class="text-sm text-secondary-500">Batch number will be auto-generated: YYYYMMDD + Tray count</p>
+
+                    <!-- Packing Machine Workers (Multiple) -->
+                    <!-- <div>
+                        <label class="form-label">Packing Machine Workers (Select Multiple)</label>
+                        <div class="relative">
+                            <button type="button" id="packingWorkerDropdownBtn" class="form-input w-full text-left flex justify-between items-center @error('packing_worker_ids') border-red-500 @enderror">
+                                <span id="packingWorkerSelectedText" class="text-gray-400">Select packing workers...</span>
+                                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </button>
+                        
+                        </div>
+                        @error('packing_worker_ids')
                             <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                         @enderror
-                    </div>
+                    </div> -->
 
-                    <!-- Prep & Deposit Helpers -->
+                    <!-- Prep & Deposit Helpers (Multiple with Table Numbers) -->
+
+                  
+
+
                     <div>
-                        <div class="flex items-center justify-between mb-3">
-                            <label class="form-label mb-0">Prep & Deposit Helpers</label>
-                            <button type="button" id="addHelper" class="btn btn-primary btn-sm">
-                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        <label class="form-label">Prep & Deposit Helpers (Select Multiple)</label>
+                        <div class="relative">
+                            <button type="button" id="helperDropdownBtn" class="form-input w-full text-left flex justify-between items-center @error('helper_ids') border-red-500 @enderror">
+                                <span id="helperSelectedText" class="text-gray-400">Select helpers...</span>
+                                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                                 </svg>
-                                Add Helper
                             </button>
+                            <div id="helperDropdown" class="hidden absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                                @foreach($helpers as $helper)
+                                    <label class="flex items-center px-4 py-2 hover:bg-gray-50 cursor-pointer">
+                                        <input type="checkbox" name="helper_ids[]" value="{{ $helper->id }}" class="helper-checkbox mr-3 h-4 w-4 text-blue-600 rounded" data-name="{{ $helper->name }}" {{ in_array($helper->id, old('helper_ids', [])) ? 'checked' : '' }}>
+                                        <span>{{ $helper->name }}</span>
+                                    </label>
+                                @endforeach
+                            </div>
                         </div>
-                        <div id="helpersContainer" class="space-y-3">
-                            <!-- Helper rows will be added here dynamically -->
+                        @error('helper_ids')
+                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                        
+                        <!-- Selected Helpers with Table Numbers -->
+                        <div id="selectedHelpersContainer" class="mt-4 space-y-2">
+                            <!-- Selected helpers will appear here -->
                         </div>
                     </div>
                 </div>
@@ -145,9 +203,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const productSelect = document.getElementById('product_id');
     const bakingTempInput = document.getElementById('baking_temp');
     const bakingTimeInput = document.getElementById('baking_time');
-    const addHelperBtn = document.getElementById('addHelper');
-    const helpersContainer = document.getElementById('helpersContainer');
-    let helperIndex = 0;
 
     // Auto-fill temperature and time when product is selected
     productSelect.addEventListener('change', function() {
@@ -161,38 +216,123 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Add helper row
-    addHelperBtn.addEventListener('click', function() {
-        const helperRow = document.createElement('div');
-        helperRow.className = 'flex gap-3 items-start helper-row';
-        helperRow.innerHTML = `
-            <div class="flex-1">
-                <select name="helpers[${helperIndex}][worker_id]" required class="form-input">
-                    <option value="">Select helper</option>
-                    @foreach($helpers as $helper)
-                        <option value="{{ $helper->id }}">{{ $helper->name }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="w-32">
-                <input type="number" name="helpers[${helperIndex}][table_number]" placeholder="Table #" class="form-input" min="1">
-            </div>
-            <button type="button" class="btn btn-danger btn-sm mt-1 remove-helper">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                </svg>
-            </button>
-        `;
-        helpersContainer.appendChild(helperRow);
-        helperIndex++;
+    // Mixer Dropdown
+    const mixerDropdownBtn = document.getElementById('mixerDropdownBtn');
+    const mixerDropdown = document.getElementById('mixerDropdown');
+    const mixerSelectedText = document.getElementById('mixerSelectedText');
+    const mixerCheckboxes = document.querySelectorAll('.mixer-checkbox');
+
+    mixerDropdownBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        mixerDropdown.classList.toggle('hidden');
     });
 
-    // Remove helper row
-    helpersContainer.addEventListener('click', function(e) {
-        if (e.target.closest('.remove-helper')) {
-            e.target.closest('.helper-row').remove();
+    mixerCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', updateMixerText);
+    });
+
+    function updateMixerText() {
+        const selected = Array.from(mixerCheckboxes)
+            .filter(cb => cb.checked)
+            .map(cb => cb.parentElement.textContent.trim());
+        
+        if (selected.length > 0) {
+            mixerSelectedText.textContent = selected.join(', ');
+            mixerSelectedText.classList.remove('text-gray-400');
+        } else {
+            mixerSelectedText.textContent = 'Select mixers...';
+            mixerSelectedText.classList.add('text-gray-400');
+        }
+    }
+
+    // Packing Worker Dropdown
+    const packingWorkerDropdownBtn = document.getElementById('packingWorkerDropdownBtn');
+    const packingWorkerDropdown = document.getElementById('packingWorkerDropdown');
+    const packingWorkerSelectedText = document.getElementById('packingWorkerSelectedText');
+    const packingWorkerCheckboxes = document.querySelectorAll('.packing-worker-checkbox');
+
+    // packingWorkerDropdownBtn.addEventListener('click', function(e) {
+    //     e.preventDefault();
+    //     packingWorkerDropdown.classList.toggle('hidden');
+    // });
+
+    packingWorkerCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', updatePackingWorkerText);
+    });
+
+    function updatePackingWorkerText() {
+        const selected = Array.from(packingWorkerCheckboxes)
+            .filter(cb => cb.checked)
+            .map(cb => cb.parentElement.textContent.trim());
+        
+        if (selected.length > 0) {
+            packingWorkerSelectedText.textContent = selected.join(', ');
+            packingWorkerSelectedText.classList.remove('text-gray-400');
+        } else {
+            packingWorkerSelectedText.textContent = 'Select packing workers...';
+            packingWorkerSelectedText.classList.add('text-gray-400');
+        }
+    }
+
+    // Helper Dropdown with Table Numbers
+    const helperDropdownBtn = document.getElementById('helperDropdownBtn');
+    const helperDropdown = document.getElementById('helperDropdown');
+    const helperSelectedText = document.getElementById('helperSelectedText');
+    const helperCheckboxes = document.querySelectorAll('.helper-checkbox');
+    const selectedHelpersContainer = document.getElementById('selectedHelpersContainer');
+
+    helperDropdownBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        helperDropdown.classList.toggle('hidden');
+    });
+
+    helperCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', updateHelperSelection);
+    });
+
+    function updateHelperSelection() {
+        const selected = Array.from(helperCheckboxes).filter(cb => cb.checked);
+        
+        if (selected.length > 0) {
+            helperSelectedText.textContent = selected.map(cb => cb.dataset.name).join(', ');
+            helperSelectedText.classList.remove('text-gray-400');
+        } else {
+            helperSelectedText.textContent = 'Select helpers...';
+            helperSelectedText.classList.add('text-gray-400');
+        }
+
+        // Update table number inputs
+        selectedHelpersContainer.innerHTML = '';
+        selected.forEach(checkbox => {
+            const helperDiv = document.createElement('div');
+            helperDiv.className = 'flex items-center gap-3 p-3 bg-gray-50 rounded-lg';
+            helperDiv.innerHTML = `
+                <div class="flex-1 font-medium text-gray-700">${checkbox.dataset.name}</div>
+                <div class="w-32">
+                    <input type="number" name="helper_table_numbers[]" placeholder="Table #" class="form-input" min="1">
+                </div>
+            `;
+            selectedHelpersContainer.appendChild(helperDiv);
+        });
+    }
+
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!mixerDropdownBtn.contains(e.target) && !mixerDropdown.contains(e.target)) {
+            mixerDropdown.classList.add('hidden');
+        }
+        if (!packingWorkerDropdownBtn.contains(e.target) && !packingWorkerDropdown.contains(e.target)) {
+            packingWorkerDropdown.classList.add('hidden');
+        }
+        if (!helperDropdownBtn.contains(e.target) && !helperDropdown.contains(e.target)) {
+            helperDropdown.classList.add('hidden');
         }
     });
+
+    // Initialize text on page load (for old values)
+    updateMixerText();
+    updatePackingWorkerText();
+    updateHelperSelection();
 });
 </script>
 @endsection
