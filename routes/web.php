@@ -10,7 +10,7 @@ use App\Http\Controllers\RawProductController;
 use App\Http\Controllers\ProducedProductController;
 use App\Http\Controllers\BroughtProductController;
 use App\Http\Controllers\DairyProductionController;
-use App\Http\Controllers\FreezertempController;
+use App\Http\Controllers\FreezerTempController;
 
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
